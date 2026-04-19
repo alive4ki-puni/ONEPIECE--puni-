@@ -1,0 +1,24 @@
+{
+  "_comment": "ハーマイオニーのリサーチ設定。あなたのThreadsアカウントのジャンルに合わせて自由に変更してください。",
+  "_howto": "変更後はClaude Codeを再起動するか、次回の /run-daily-cycle から自動で反映されます。",
+
+  "topic_genre": "育児・子育て",
+
+  "youtube_channel_ids": [],
+  "_youtube_channel_notes": [
+    "育児・子育て系チャンネルを追加してください"
+  ],
+
+  "youtube_keywords": [
+    "昭和 育児 子育て",
+    "昭和オカン 子育て方法",
+    "育児 しつけ 令和 昭和 比較",
+    "子育て 厳しさ 愛情"
+  ],
+
+  "rss_feeds": [
+    "https://rss.itmedia.co.jp/rss/2.0/itmediabusiness.xml",
+    "https://woman.excite.co.jp/rss/",
+    "https://kidsna.com/feed"
+  ]
+}
