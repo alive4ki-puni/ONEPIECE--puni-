@@ -1,4 +1,4 @@
-name: Scheduled Post Slot2 (12時)
+name: Scheduled Post Slot1 (7時)
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
       slot:
         description: 'Post slot'
         required: false
-        default: 'SLOT_2'
+        default: 'SLOT_1'
 
 jobs:
   post:
@@ -26,4 +26,4 @@ jobs:
         env:
           THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
           THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
-        run: python scripts/post_to_threads.py --slot SLOT_2
+        run: python scripts/post_to_threads.py --slot SLOT_1
