@@ -1,29 +1,21 @@
-name: Scheduled Post Slot3 (21時)
+name: Post Slot 3 (夜21時)
 
 on:
   workflow_dispatch:
-    inputs:
-      slot:
-        description: 'Post slot'
-        required: false
-        default: 'SLOT_3'
 
 jobs:
   post:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-
-      - name: Install dependencies
-        run: pip install requests
-
-      - name: Post to Threads
+      - run: pip install requests
+      - run: python scripts/post_to_threads.py --slot SLOT_3
         env:
           THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
           THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
-        run: python scripts/post_to_threads.py --slot SLOT_3
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ secrets.GH_REPO }}
+          TZ: Asia/Tokyo
