@@ -1,9 +1,6 @@
 name: Snape Daily Monitor (Quality + Health Watch)
 
 on:
-  schedule:
-    - cron: '13,43 22,23 * * *'
-    - cron: '13,43 0,1,2,3 * * *'
   workflow_dispatch:
     inputs:
       mode:
@@ -30,6 +27,15 @@ jobs:
         run: |
           mkdir -p operation/auth
           printf '%s' "$HOG_ACCESS_KEY" | tr -d '\r' > operation/auth/access_HOG-2026-04.key
+
+      - name: Debug key file
+        run: |
+          echo "=== File exists ==="
+          ls -la operation/auth/
+          echo "=== Line count ==="
+          wc -l operation/auth/access_HOG-2026-04.key
+          echo "=== First line hex ==="
+          head -1 operation/auth/access_HOG-2026-04.key | xxd | head -3
 
       - name: Set up Python
         uses: actions/setup-python@v5
