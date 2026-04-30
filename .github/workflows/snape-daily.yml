@@ -25,9 +25,16 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Restore auth key file
+        env:
+          HOG_ACCESS_KEY: ${{ secrets.HOG_ACCESS_KEY }}
         run: |
           mkdir -p operation/auth
-          echo "${{ secrets.HOG_ACCESS_KEY }}" > operation/auth/access_HOG-2026-04.key
+          python3 -c "
+import os
+content = os.environ.get('HOG_ACCESS_KEY', '')
+with open('operation/auth/access_HOG-2026-04.key', 'w') as f:
+    f.write(content)
+"
 
       - name: Set up Python
         uses: actions/setup-python@v5
