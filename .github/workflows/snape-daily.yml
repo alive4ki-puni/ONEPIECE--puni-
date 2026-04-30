@@ -29,12 +29,7 @@ jobs:
           HOG_ACCESS_KEY: ${{ secrets.HOG_ACCESS_KEY }}
         run: |
           mkdir -p operation/auth
-          python3 -c "
-import os
-content = os.environ.get('HOG_ACCESS_KEY', '')
-with open('operation/auth/access_HOG-2026-04.key', 'w') as f:
-    f.write(content)
-"
+          printf '%s' "$HOG_ACCESS_KEY" > operation/auth/access_HOG-2026-04.key
 
       - name: Set up Python
         uses: actions/setup-python@v5
