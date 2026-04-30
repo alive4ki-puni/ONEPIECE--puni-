@@ -29,7 +29,7 @@ jobs:
           HOG_ACCESS_KEY: ${{ secrets.HOG_ACCESS_KEY }}
         run: |
           mkdir -p operation/auth
-          printf '%s' "$HOG_ACCESS_KEY" > operation/auth/access_HOG-2026-04.key
+          printf '%s' "$HOG_ACCESS_KEY" | tr -d '\r' > operation/auth/access_HOG-2026-04.key
 
       - name: Set up Python
         uses: actions/setup-python@v5
