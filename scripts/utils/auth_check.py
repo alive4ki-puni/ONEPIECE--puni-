@@ -1,20 +1,32 @@
 """
 auth_check.py - 月次アクセストークン検証
-scripts/utils/ に置いて、各メインスクリプトから呼び出す。
+scripts/utils/ に置いて、各メインスクリプトから呼び出す
 """
 
-import os
 import re
 from datetime import date
 from pathlib import Path
 
 
+_CS_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+
+def _expected_checksum(year: int, month: int) -> str:
+    digit_sum = sum(int(c) for c in f"{year}{month:02d}")
+    idx1 = digit_sum % 36
+    idx2 = (digit_sum * 3 + 7) % 36
+    return _CS_CHARS[idx1] + _CS_CHARS[idx2]
+
+
+def _verify_checksum(token: str, year: int, month: int) -> bool:
+    suffix = token.split("-")[-1]
+    if len(suffix) < 2:
+        return False
+    actual_cs = suffix[-2:]
+    return actual_cs == _expected_checksum(year, month)
+
+
 def check_auth() -> tuple[bool, str]:
-    """
-    operation/auth/ の .key ファイルを検証する。
-    Returns: (is_valid: bool, message: str)
-    """
-    # scripts/utils から operation/auth/ へのパスを解決
     script_dir = Path(__file__).resolve().parent.parent.parent
     auth_dir = script_dir / "operation" / "auth"
 
@@ -41,21 +53,34 @@ def check_auth() -> tuple[bool, str]:
 
     token_line = lines[0].strip()
 
-    # トークン形式チェック: HOG-AUTH-YYYY-MM-XXXXXX
-    if not re.match(r"^HOG-AUTH-\d{4}-\d{2}-[A-Z0-9]+$", token_line):
+    m = re.match(r"^HOG-AUTH-(\d{4})-(\d{2})-([A-Z0-9]{8,})$", token_line)
+    if not m:
         return False, (
             f"トークン形式が不正です: {token_line}\n"
             "コミュニティ管理者から正しいトークンファイルを受け取ってください。"
         )
 
-    # キー・バリューを解析
+    token_year, token_month = int(m.group(1)), int(m.group(2))
+
+    if not _verify_checksum(token_line, token_year, token_month):
+        return False, (
+            "トークンの整合性チェックに失敗しました。\n"
+            "コミュニティ管理者から正しいトークンファイルを受け取ってください。"
+        )
+
     kv = {}
     for line in lines[1:]:
         if ":" in line:
             k, _, v = line.partition(":")
             kv[k.strip()] = v.strip()
 
-    # 有効期限チェック
+    issued_by = kv.get("issued_by", "")
+    if issued_by != "ai-community-hogwarts":
+        return False, (
+            "トークンの発行者情報が不正です。\n"
+            "コミュニティ管理者から正しいトークンファイルを受け取ってください。"
+        )
+
     valid_until_str = kv.get("valid_until", "")
     if not valid_until_str:
         return False, "valid_until が見つかりません。トークンファイルが破損している可能性があります。"
@@ -75,3 +100,12 @@ def check_auth() -> tuple[bool, str]:
         )
 
     return True, f"認証OK（トークン有効期限: {valid_until_str}）"
+
+
+def generate_token(year: int, month: int, random_prefix: str = "") -> str:
+    import random
+    import string
+    if not random_prefix:
+        random_prefix = "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
+    cs = _expected_checksum(year, month)
+    return f"HOG-AUTH-{year}-{month:02d}-{random_prefix}{cs}"
