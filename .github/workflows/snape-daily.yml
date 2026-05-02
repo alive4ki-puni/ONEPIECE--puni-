@@ -11,6 +11,10 @@ on:
         required: false
         default: 'full'
 
+concurrency:
+  group: snape-monitor
+  cancel-in-progress: false
+
 permissions:
   issues: write
   contents: read
